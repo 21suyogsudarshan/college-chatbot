@@ -1,11 +1,12 @@
 import os
+import json
+import re
 import traceback
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
-from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from rank_bm25 import BM25Okapi
 from openai import OpenAI
 
 app = FastAPI(title="Campus Assistant API")
@@ -18,13 +19,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. Load Local Vector Store
-CHROMA_PATH = "./chroma_db"
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-vector_store = Chroma(persist_directory=CHROMA_PATH, embedding_function=embeddings)
-retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+KNOWLEDGE_FILE = "knowledge.json"
+if os.path.exists(KNOWLEDGE_FILE):
+    with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
+        documents = json.load(f)
+else:
+    documents = ["ABV-IIITM Gwalior official institutional knowledge base."]
 
-# 2. Configure Groq LLM
+def tokenize(text):
+    return re.findall(r"\w+", text.lower())
+
+tokenized_corpus = [tokenize(doc) for doc in documents]
+bm25 = BM25Okapi(tokenized_corpus)
+
+def retrieve_top_k(query, k=5):
+    query_tokens = tokenize(query)
+    scores = bm25.get_scores(query_tokens)
+    top_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
+    matched = [documents[i] for i in top_indices if scores[i] > 0]
+    return matched if matched else [documents[i] for i in top_indices[:k]]
+
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
 client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=GROQ_API_KEY)
 
@@ -44,11 +58,10 @@ SYSTEM_PROMPT = """You are the official helpdesk counselor for ABV-IIITM Gwalior
 Provide direct, clean, and helpful answers to students and visitors based strictly on the provided context.
 
 Tone & Formatting Guidelines:
-1. Speak like a friendly, professional human counselor. Never use robotic phrases like "Based on the provided documents", "Adding the numbers together", or "As an AI".
-2. NEVER use LaTeX formatting or math brackets (no '\\[' or '\\]' or '\\mathbf'). Always write currency naturally (e.g., ₹95,000 or Rs. 95,000).
+1. Speak like a friendly, professional human counselor. Never use robotic phrases like "Based on the provided documents" or "As an AI".
+2. NEVER use LaTeX formatting or math brackets (no '\[' or '\]' or '\mathbf'). Always write currency naturally (e.g., ₹95,000 or Rs. 95,000).
 3. Do NOT output raw Markdown tables with pipe characters ('|'). Instead, organize fee items and data into clean, easy-to-read bullet points with bold titles.
-4. Keep answers clear, structured, and easy to read on mobile and web chat widgets.
-5. If a specific detail is not found in the documents, state it politely and direct them to the appropriate office email (e.g., academic@iiitm.ac.in or info@iiitm.ac.in).
+4. If a specific detail is not found in the documents, state it politely and direct them to the appropriate office email.
 
 Context:
 {context}
@@ -91,7 +104,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     <p>The academic, admissions, and campus life assistant is active. Click the blue chat bubble at the bottom right to start querying about courses, fee breakdowns, ordinances, or hostel rules.</p>
   </div>
 
-  <div id="cb-bubble">💬</div>
+  <div id="cb-bubble">&#128172;</div>
   <div id="cb-window">
     <div id="cb-header">
       ABV-IIITM Assistant
@@ -113,7 +126,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     const sendBtn = document.getElementById("cb-send");
     const messages = document.getElementById("cb-messages");
 
-    bubble.onclick = () => {
+    bubble.onclick = function() {
       win.style.display = win.style.display === "flex" ? "none" : "flex";
       if (win.style.display === "flex") input.focus();
     };
@@ -125,19 +138,19 @@ HTML_CONTENT = """<!DOCTYPE html>
         .replace(/(<li>.*<\\/li>)/gs, '<ul>$1</ul>')
         .replace(/\\n\\n+/g, '</p><p>')
         .replace(/\\n/g, '<br/>');
-      return `<p>${formatted}</p>`;
+      return '<p>' + formatted + '</p>';
     }
 
     async function handleSend() {
       const text = input.value.trim();
       if (!text) return;
 
-      messages.innerHTML += `<div class="cb-msg cb-user">${text}</div>`;
+      messages.innerHTML += '<div class="cb-msg cb-user">' + text + '</div>';
       input.value = "";
       messages.scrollTop = messages.scrollHeight;
 
       const loadingId = "bot-loading-" + Date.now();
-      messages.innerHTML += `<div id="${loadingId}" class="cb-msg cb-bot" style="color: #64748b;">Thinking...</div>`;
+      messages.innerHTML += '<div id="' + loadingId + '" class="cb-msg cb-bot" style="color: #64748b;">Thinking...</div>';
       messages.scrollTop = messages.scrollHeight;
 
       try {
@@ -148,16 +161,16 @@ HTML_CONTENT = """<!DOCTYPE html>
         });
         const data = await res.json();
         const loadingElem = document.getElementById(loadingId);
-        if (loadingElem) loadingElem.outerHTML = `<div class="cb-msg cb-bot">${formatText(data.reply)}</div>`;
+        if (loadingElem) loadingElem.outerHTML = '<div class="cb-msg cb-bot">' + formatText(data.reply) + '</div>';
       } catch (err) {
         const loadingElem = document.getElementById(loadingId);
-        if (loadingElem) loadingElem.outerHTML = `<div class="cb-msg cb-bot" style="color:#dc2626;">Could not reach server.</div>`;
+        if (loadingElem) loadingElem.outerHTML = '<div class="cb-msg cb-bot" style="color:#dc2626;">Could not reach server.</div>';
       }
       messages.scrollTop = messages.scrollHeight;
     }
 
     sendBtn.onclick = handleSend;
-    input.onkeypress = (e) => { if (e.key === "Enter") handleSend(); };
+    input.onkeypress = function(e) { if (e.key === "Enter") handleSend(); };
   </script>
 </body>
 </html>
@@ -177,8 +190,8 @@ async def chat(request: QueryRequest):
         if not user_query:
             return JSONResponse({"reply": "Please enter a valid question."})
 
-        docs = retriever.invoke(user_query)
-        context = "\n\n".join([doc.page_content for doc in docs])
+        matched_docs = retrieve_top_k(user_query, k=5)
+        context = "\n\n".join(matched_docs)
 
         response = client.chat.completions.create(
             model=ACTIVE_MODEL,
