@@ -63,7 +63,7 @@ Core Identity & Creator Instructions:
 
 Tone & Formatting Guidelines:
 1. Speak like a friendly, professional human counselor. Never use robotic phrases like "Based on the provided documents" or "As an AI".
-2. NEVER use LaTeX formatting or math brackets (no '\[' or '\]' or '\mathbf'). Always write currency naturally (e.g., ₹95,000 or Rs. 95,000).
+2. NEVER use LaTeX formatting or math brackets (no '\\[' or '\\]' or '\\mathbf'). Always write currency naturally (e.g., ₹95,000 or Rs. 95,000).
 3. Do NOT output raw Markdown tables with pipe characters ('|'). Instead, organize fee items and data into clean, easy-to-read bullet points with bold titles.
 4. If a specific detail is not found in the documents, state it politely and direct them to the appropriate office email.
 
@@ -79,10 +79,23 @@ HTML_CONTENT = """<!DOCTYPE html>
   <title>Vajra AI | ABV-IIITM Gwalior</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; color: #1e293b; display: flex; justify-content: center; }
-    .card { background: white; max-width: 680px; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
-    h1 { color: #004085; margin-top: 0; font-size: 24px; }
-    p { line-height: 1.6; color: #475569; }
-    .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
+    .card { background: white; max-width: 760px; width: 100%; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
+    
+    /* Official Institute Header Branding */
+    .institute-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 24px; }
+    .logo-container { flex-shrink: 0; text-align: center; }
+    .logo-img { width: 78px; height: auto; display: block; margin: 0 auto; }
+    .sanskrit-motto { font-size: 11px; color: #002b66; font-weight: 600; margin-top: 4px; letter-spacing: 0.3px; }
+    .institute-titles { flex: 1; }
+    .institute-name { font-size: 21px; font-weight: 700; color: #002b66; line-height: 1.3; margin: 0 0 6px 0; }
+    .institute-subtitle { font-size: 13px; color: #002b66; font-weight: 600; margin: 0; }
+    
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
+    .badge-dot { width: 8px; height: 8px; background: #0284c7; border-radius: 50%; display: inline-block; }
+    h2 { color: #004085; margin: 10px 0 8px 0; font-size: 20px; }
+    p { line-height: 1.6; color: #475569; margin: 0 0 12px 0; }
+    
+    /* Floating Chat Widget */
     #cb-bubble { position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: #004085; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.25); z-index: 9999; font-size: 26px; }
     #cb-window { position: fixed; bottom: 96px; right: 24px; width: 380px; height: 530px; background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #e2e8f0; }
     #cb-header { background: #004085; color: #fff; padding: 14px 18px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
@@ -103,9 +116,31 @@ HTML_CONTENT = """<!DOCTYPE html>
 </head>
 <body>
   <div class="card">
-    <div class="badge">&#9889; Vajra AI Active</div>
-    <h1>ABV-IIITM Gwalior Campus Assistant</h1>
-    <p>Welcome to <strong>Vajra AI</strong>, the smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right to query about courses, admissions, fee breakdowns, ordinances, or hostel guidelines.</p>
+    <div class="institute-header">
+      <div class="logo-container">
+        <svg class="logo-img" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Top Circles -->
+          <circle cx="50" cy="22" r="14" fill="#002b66"/>
+          <circle cx="50" cy="22" r="18" stroke="#002b66" stroke-width="1.5" fill="none"/>
+          <circle cx="50" cy="22" r="21" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Pillar Base -->
+          <rect x="34" y="60" width="32" height="42" fill="#94a3b8"/>
+          <!-- IIIT Arch -->
+          <path d="M22 40 C 22 36, 28 36, 32 40 L 32 72 L 22 72 Z" fill="#002b66"/>
+          <path d="M38 40 C 38 36, 62 36, 62 40 L 62 72 L 52 72 L 52 48 L 48 48 L 48 72 L 38 72 Z" fill="#002b66"/>
+          <path d="M68 40 C 68 36, 78 36, 78 40 L 78 72 L 68 72 Z" fill="#002b66"/>
+        </svg>
+        <div class="sanskrit-motto">विश्वजीवनामृतं ज्ञानम्</div>
+      </div>
+      <div class="institute-titles">
+        <div class="institute-name">Atal Bihari Vajpayee<br/>Indian Institute of Information<br/>Technology and Management, Gwalior.</div>
+        <div class="institute-subtitle">(An Institute of National Importance, Ministry of Education, Government of India)</div>
+      </div>
+    </div>
+
+    <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
+    <h2>Campus AI Assistant</h2>
+    <p>Welcome to <strong>Vajra AI</strong>, the official smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right to query about courses, admissions, fee schedules, ordinances, or hostel guidelines.</p>
   </div>
 
   <div id="cb-bubble">&#128172;</div>
@@ -194,7 +229,6 @@ async def chat(request: QueryRequest):
         if not user_query:
             return JSONResponse({"reply": "Please enter a valid question."})
 
-        # Check for creator / developer questions directly
         creator_patterns = ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "creator", "founder"]
         if any(p in user_query.lower() for p in creator_patterns):
             return {"reply": "I was created and developed by **Suyog** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior."}
