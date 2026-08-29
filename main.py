@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from rank_bm25 import BM25Okapi
 from openai import OpenAI
 
-app = FastAPI(title="Campus Assistant API")
+app = FastAPI(title="Vajra AI - Campus Assistant")
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Load Knowledge Base & Search Engine
 KNOWLEDGE_FILE = "knowledge.json"
 if os.path.exists(KNOWLEDGE_FILE):
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
@@ -54,8 +55,11 @@ def get_best_available_model():
 
 ACTIVE_MODEL = get_best_available_model()
 
-SYSTEM_PROMPT = """You are the official helpdesk counselor for ABV-IIITM Gwalior.
-Provide direct, clean, and helpful answers to students and visitors based strictly on the provided context.
+SYSTEM_PROMPT = """You are Vajra AI, the official smart campus assistant for ABV-IIITM Gwalior.
+
+Core Identity & Creator Instructions:
+- If anyone asks who created you, built you, founded you, or developed you, answer clearly and warmly that you were created and developed by SUYOG from the 2024 BEE (B.Tech Electrical & Electronics Engineering) batch.
+- When introducing yourself or answering identity questions, refer to yourself as Vajra AI.
 
 Tone & Formatting Guidelines:
 1. Speak like a friendly, professional human counselor. Never use robotic phrases like "Based on the provided documents" or "As an AI".
@@ -72,7 +76,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABV-IIITM Gwalior Assistant</title>
+  <title>Vajra AI | ABV-IIITM Gwalior</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; color: #1e293b; display: flex; justify-content: center; }
     .card { background: white; max-width: 680px; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
@@ -99,19 +103,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 </head>
 <body>
   <div class="card">
-    <div class="badge">Active & Grounded</div>
-    <h1>ABV-IIITM Gwalior Assistant</h1>
-    <p>The academic, admissions, and campus life assistant is active. Click the blue chat bubble at the bottom right to start querying about courses, fee breakdowns, ordinances, or hostel rules.</p>
+    <div class="badge">&#9889; Vajra AI Active</div>
+    <h1>ABV-IIITM Gwalior Campus Assistant</h1>
+    <p>Welcome to <strong>Vajra AI</strong>, the smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right to query about courses, admissions, fee breakdowns, ordinances, or hostel guidelines.</p>
   </div>
 
   <div id="cb-bubble">&#128172;</div>
   <div id="cb-window">
     <div id="cb-header">
-      ABV-IIITM Assistant
-      <span>Official Support</span>
+      Vajra AI
+      <span>ABV-IIITM</span>
     </div>
     <div id="cb-messages">
-      <div class="cb-msg cb-bot">Hello! How can I help you with admissions, syllabi, fees, or hostel queries?</div>
+      <div class="cb-msg cb-bot">Hello! I am <strong>Vajra AI</strong>, your campus assistant. How can I help you with admissions, syllabi, fees, or hostel queries?</div>
     </div>
     <div id="cb-input-area">
       <input type="text" id="cb-input" placeholder="Ask a question..." />
@@ -189,6 +193,11 @@ async def chat(request: QueryRequest):
         user_query = request.query.strip()
         if not user_query:
             return JSONResponse({"reply": "Please enter a valid question."})
+
+        # Check for creator / developer questions directly
+        creator_patterns = ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "creator", "founder"]
+        if any(p in user_query.lower() for p in creator_patterns):
+            return {"reply": "I was created and developed by **Suyog** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior."}
 
         matched_docs = retrieve_top_k(user_query, k=5)
         context = "\n\n".join(matched_docs)
