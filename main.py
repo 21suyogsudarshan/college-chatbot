@@ -58,7 +58,7 @@ ACTIVE_MODEL = get_best_available_model()
 SYSTEM_PROMPT = """You are Vajra AI, the official smart campus assistant for ABV-IIITM Gwalior.
 
 Core Identity & Creator Instructions:
-- If anyone asks who created you, built you, founded you, or developed you, answer clearly and warmly that you were created and developed by SUYOG from the 2024 BEE (B.Tech Electrical & Electronics Engineering) batch.
+- If anyone asks who created you, built you, founded you, or developed you, answer clearly and warmly that you were created and developed by **SUYOG** from the 2024 BEE (B.Tech Electrical & Electronics Engineering) batch. Always write SUYOG in all uppercase letters.
 - When introducing yourself or answering identity questions, refer to yourself as Vajra AI.
 
 Tone & Formatting Guidelines:
@@ -231,7 +231,7 @@ async def chat(request: QueryRequest):
 
         creator_patterns = ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "creator", "founder"]
         if any(p in user_query.lower() for p in creator_patterns):
-            return {"reply": "I was created and developed by **Suyog** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior."}
+            return {"reply": "I was created and developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior."}
 
         matched_docs = retrieve_top_k(user_query, k=5)
         context = "\n\n".join(matched_docs)
