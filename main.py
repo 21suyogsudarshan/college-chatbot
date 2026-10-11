@@ -58,16 +58,26 @@ ACTIVE_MODEL = get_best_available_model()
 def get_specific_iiitm_link(query):
     q = query.lower().strip()
     
-    # 1. Faculty Member Detection (e.g., Dr. Manoj Singh Parihar)
-    faculty_match = re.search(r"(dr\.|prof\.|professor|dr)?\s*([a-z\s]+)", q)
-    if any(name in q for name in ["parihar", "manoj singh parihar", "manoj parihar"]):
-        return "http://www.iiitm.ac.in/staff/faculty/dr-manoj-singh-parihar"
-    elif "sri niwas singh" in q or "sn singh" in q or "director" in q:
+    # 1. Direct Faculty Mappings
+    if "pinku" in q or "ranjan" in q:
+        return "https://iiitm.ac.in/staff/faculty/dr-pinku-ranjan"
+    elif "parihar" in q or "manoj" in q:
+        return "https://www.iiitm.ac.in/staff/faculty/dr-manoj-singh-parihar"
+    elif "sri niwas" in q or "sn singh" in q or "director" in q:
         return "https://iiitm.ac.in/whos-who"
-    elif "faculty" in q or "professor" in q or "staff" in q or "teacher" in q or "hod" in q:
+    
+    # Dynamic Dr. Name match generator for unmapped professors
+    dr_match = re.search(r"(?:dr\.|prof\.|professor)?\s*([a-z]+)\s+([a-z]+)", q)
+    if dr_match and "dr" in q:
+        first, last = dr_match.group(1), dr_match.group(2)
+        if first not in ["what", "who", "where", "how", "tell"]:
+            return f"https://iiitm.ac.in/staff/faculty/dr-{first}-{last}"
+
+    # 2. General Faculty Index
+    if "faculty" in q or "professor" in q or "staff" in q or "teacher" in q or "hod" in q:
         return "https://iiitm.ac.in/staff"
 
-    # 2. Specific Departments & Courses
+    # 3. Departments & Courses
     if "eee" in q or "electrical" in q:
         return "https://www.iiitm.ac.in/departments/electrical-electronics-engineering"
     elif "cse" in q or "computer science" in q:
@@ -81,27 +91,26 @@ def get_specific_iiitm_link(query):
     elif "btech" in q or "b.tech" in q or "jee" in q:
         return "https://www.iiitm.ac.in/course/b-tech-in-computer-science-engineering"
 
-    # 3. Fees & Financials
+    # 4. Fees & Financials
     elif "fee" in q or "cost" in q or "tuition" in q or "scholarship" in q:
         return "https://www.iiitm.ac.in/index.php/academics/fee-structure"
 
-    # 4. Hostel & Mess
+    # 5. Hostel & Mess
     elif "hostel" in q or "mess" in q or "room" in q or "curfew" in q:
         return "https://www.iiitm.ac.in/index.php/facilities/hostel"
 
-    # 5. Placements & Career
-    elif "placement" in q or "package" in q or "ctc" in q or "company" in q or "recruiter" in q:
+    # 6. Placements
+    elif "placement" in q or "package" in q or "ctc" in q or "company" in q:
         return "https://www.iiitm.ac.in/index.php/placements/overview"
 
-    # Default Official College Portal
     return "https://www.iiitm.ac.in/"
 
 SYSTEM_PROMPT = """You are Vajra AI, the official campus assistant for ABV-IIITM Gwalior.
 
-CRITICAL INSTRUCTIONS FROM DIRECTOR:
-1. ALWAYS GIVE BRIEF & CONCISE ANSWERS: Never write long paragraphs. Present answers strictly in 2 to 3 short bullet points.
-2. CREATOR ATTRIBUTION: If asked who created/built/founded you, state clearly that you were developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch.
-3. MANDATORY LINK ENDING: Every single response MUST conclude with this exact text on a new line:
+DIRECTOR REQUIREMENTS:
+1. ALWAYS GIVE BRIEF & CONCISE ANSWERS: Maximum 2 to 3 bullet points.
+2. CREATOR ATTRIBUTION: If asked who created/built/founded you, state that you were developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch.
+3. MANDATORY LINK ENDING: Every single response MUST end strictly with:
    "For more info check out this link: {specific_link}"
 
 Context:
@@ -118,14 +127,12 @@ async def chat(request: QueryRequest):
         if not user_query:
             return JSONResponse({"reply": "Please enter a valid question."})
 
-        # Ambiguous admission inquiry disambiguation
         q_lower = user_query.lower()
         if q_lower in ["admission", "admissions", "admission?", "admissions?"]:
             return {
                 "reply": "Which academic program admission are you inquiring about?\n\n• **B.Tech / Integrated B.Tech**\n• **M.Tech**\n• **MBA**\n• **Ph.D.**\n\nFor more info check out this link: https://www.iiitm.ac.in/index.php/admissions/archive"
             }
 
-        # Creator attribution check
         if any(p in q_lower for p in ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "built vajra"]):
             return {
                 "reply": "• I was created and developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior.\n\nFor more info check out this link: https://www.iiitm.ac.in/"
