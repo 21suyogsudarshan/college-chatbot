@@ -27,7 +27,6 @@
       border: 1px solid #e2e8f0;
     }
     
-    /* Official Institute Header */
     .institute-header {
       display: flex;
       align-items: center;
@@ -36,39 +35,12 @@
       padding-bottom: 24px;
       margin-bottom: 24px;
     }
-    .logo-container {
-      flex-shrink: 0;
-      text-align: center;
-    }
-    .logo-img {
-      width: 82px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
-    .sanskrit-motto {
-      font-size: 11px;
-      color: #002b66;
-      font-weight: 700;
-      margin-top: 6px;
-      letter-spacing: 0.2px;
-    }
-    .institute-titles {
-      flex: 1;
-    }
-    .institute-name {
-      font-size: 21px;
-      font-weight: 800;
-      color: #002b66;
-      line-height: 1.3;
-      margin: 0 0 6px 0;
-    }
-    .institute-subtitle {
-      font-size: 12.5px;
-      color: #1e3a8a;
-      font-weight: 600;
-      margin: 0;
-    }
+    .logo-container { flex-shrink: 0; text-align: center; }
+    .logo-img { width: 82px; height: auto; display: block; margin: 0 auto; }
+    .sanskrit-motto { font-size: 11px; color: #002b66; font-weight: 700; margin-top: 6px; letter-spacing: 0.2px; }
+    .institute-titles { flex: 1; }
+    .institute-name { font-size: 21px; font-weight: 800; color: #002b66; line-height: 1.3; margin: 0 0 6px 0; }
+    .institute-subtitle { font-size: 12.5px; color: #1e3a8a; font-weight: 600; margin: 0; }
     
     .badge {
       display: inline-flex;
@@ -82,26 +54,10 @@
       font-size: 13px;
       margin-bottom: 12px;
     }
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      background: #0284c7;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    h2 {
-      color: #002b66;
-      margin: 8px 0 8px 0;
-      font-size: 22px;
-    }
-    p {
-      line-height: 1.6;
-      color: #475569;
-      margin: 0 0 20px 0;
-      font-size: 15px;
-    }
+    .badge-dot { width: 8px; height: 8px; background: #0284c7; border-radius: 50%; display: inline-block; }
+    h2 { color: #002b66; margin: 8px 0 8px 0; font-size: 22px; }
+    p { line-height: 1.6; color: #475569; margin: 0 0 20px 0; font-size: 15px; }
     
-    /* Interactive FAQ Chips Layout */
     .faq-title {
       font-size: 14px;
       font-weight: 800;
@@ -112,21 +68,9 @@
       border-bottom: 1px solid #cbd5e1;
       padding-bottom: 6px;
     }
-    .faq-category {
-      margin-bottom: 18px;
-    }
-    .faq-cat-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .faq-category { margin-bottom: 18px; }
+    .faq-cat-label { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
@@ -148,140 +92,30 @@
       transform: translateY(-1px);
     }
 
-    /* Floating Chat Window & Widget */
     #cb-bubble {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 62px;
-      height: 62px;
-      background: #002b66;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 43, 102, 0.3);
-      z-index: 9999;
-      font-size: 26px;
-      transition: transform 0.2s ease;
+      position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: #002b66; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 43, 102, 0.3); z-index: 9999; font-size: 26px; transition: transform 0.2s ease;
     }
-    #cb-bubble:hover {
-      transform: scale(1.05);
-    }
+    #cb-bubble:hover { transform: scale(1.05); }
     #cb-window {
-      position: fixed;
-      bottom: 96px;
-      right: 24px;
-      width: 400px;
-      height: 550px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 9999;
-      border: 1px solid #e2e8f0;
+      position: fixed; bottom: 96px; right: 24px; width: 420px; height: 570px; background: #fff; border-radius: 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.15); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #e2e8f0;
     }
     #cb-header {
-      background: #002b66;
-      color: #fff;
-      padding: 16px 20px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 16px;
+      background: #002b66; color: #fff; padding: 16px 20px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; font-size: 16px;
     }
-    #cb-header span {
-      font-size: 11px;
-      background: #2563eb;
-      padding: 3px 9px;
-      border-radius: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    #cb-messages {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: #f8fafc;
-    }
-    .cb-msg {
-      padding: 11px 15px;
-      border-radius: 14px;
-      max-width: 86%;
-      line-height: 1.5;
-      word-wrap: break-word;
-      font-size: 14px;
-    }
-    .cb-msg p {
-      margin: 0 0 8px 0;
-      color: inherit;
-      font-size: 14px;
-    }
-    .cb-msg p:last-child {
-      margin-bottom: 0;
-    }
-    .cb-msg ul {
-      margin: 4px 0 8px 18px;
-      padding: 0;
-    }
-    .cb-msg li {
-      margin-bottom: 4px;
-    }
-    .cb-user {
-      background: #002b66;
-      color: #fff;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-    .cb-bot {
-      background: #ffffff;
-      color: #1e293b;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
-    }
-    #cb-input-area {
-      display: flex;
-      border-top: 1px solid #e2e8f0;
-      background: #fff;
-      padding: 12px;
-    }
-    #cb-input {
-      flex: 1;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px 14px;
-      outline: none;
-      font-size: 14px;
-    }
-    #cb-input:focus {
-      border-color: #002b66;
-    }
-    #cb-send {
-      background: #002b66;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 0 20px;
-      margin-left: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: background 0.2s ease;
-    }
-    #cb-send:hover {
-      background: #1e3a8a;
-    }
+    #cb-header span { font-size: 11px; background: #2563eb; padding: 3px 9px; border-radius: 12px; font-weight: 600; text-transform: uppercase; }
+    #cb-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
+    .cb-msg { padding: 11px 15px; border-radius: 14px; max-width: 88%; line-height: 1.5; word-wrap: break-word; font-size: 14px; }
+    .cb-msg p { margin: 0 0 8px 0; color: inherit; font-size: 14px; }
+    .cb-msg p:last-child { margin-bottom: 0; }
+    .cb-msg ul { margin: 4px 0 8px 18px; padding: 0; }
+    .cb-msg li { margin-bottom: 4px; }
+    .cb-msg a { color: #2563eb; text-decoration: underline; font-weight: 600; word-break: break-all; }
+    .cb-user { background: #002b66; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .cb-bot { background: #ffffff; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+    #cb-input-area { display: flex; border-top: 1px solid #e2e8f0; background: #fff; padding: 12px; }
+    #cb-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; outline: none; font-size: 14px; }
+    #cb-input:focus { border-color: #002b66; }
+    #cb-send { background: #002b66; color: #fff; border: none; border-radius: 8px; padding: 0 20px; margin-left: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -307,13 +141,22 @@
 
     <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
     <h2>Campus AI Assistant</h2>
-    <p>Welcome to <strong>Vajra AI</strong>, the official campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or select any FAQ below to get grounded answers instantly.</p>
+    <p>Welcome to <strong>Vajra AI</strong>, the official campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or select any FAQ below to get brief answers with direct official links.</p>
     
     <div class="faq-title">Frequently Asked Questions (FAQs)</div>
 
     <div class="faq-category">
+      <div class="faq-cat-label">👨‍🏫 Faculty & Staff</div>
+      <div class="chips">
+        <div class="chip" onclick="sendPreset('Tell me about Dr. Manoj Singh Parihar')">Dr. Manoj Singh Parihar Profile</div>
+        <div class="chip" onclick="sendPreset('Who is the Director of IIITM Gwalior?')">Director Profile</div>
+      </div>
+    </div>
+
+    <div class="faq-category">
       <div class="faq-cat-label">💰 Admissions & Fees</div>
       <div class="chips">
+        <div class="chip" onclick="sendPreset('Admissions')">🎓 Admissions Overview (Select Program)</div>
         <div class="chip" onclick="sendPreset('What is the total fee for B.Tech?')">What is the total fee for B.Tech?</div>
         <div class="chip" onclick="sendPreset('What is the total, actual cost after financial aid and scholarships?')">Total cost after financial aid & scholarships?</div>
         <div class="chip" onclick="sendPreset('Are there scholarships or hostel fee waivers?')">Scholarships or hostel fee waivers?</div>
@@ -381,8 +224,9 @@
 
     function formatText(text) {
       let formatted = text
+        .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\s*\*\s+(.*)$/gm, '<li>$1</li>')
+        .replace(/^\s*[\*\•]\s+(.*)$/gm, '<li>$1</li>')
         .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
         .replace(/\n\n+/g, '</p><p>')
         .replace(/\n/g, '<br/>');
@@ -395,10 +239,18 @@
       input.value = "";
       messages.scrollTop = messages.scrollHeight;
 
-      // Direct creator attribution rule
-      const lower = text.toLowerCase();
-      if (lower.includes("who made") || lower.includes("who created") || lower.includes("who developed") || lower.includes("founder") || lower.includes("creator") || lower.includes("built vajra")) {
-        messages.innerHTML += '<div class="cb-msg cb-bot"><p>I was created and developed by <strong>SUYOG</strong> from the <strong>2024 BEE (B.Tech Electrical & Electronics Engineering)</strong> batch at ABV-IIITM Gwalior.</p></div>';
+      // Ambiguous admission check
+      const lower = text.toLowerCase().trim();
+      if (lower === "admission" || lower === "admissions" || lower === "admission?") {
+        const optionMsg = '<p>Which academic program admission are you inquiring about?</p>' +
+          '<ul>' +
+          '<li><a href="#" onclick="sendPreset(\'B.Tech admission criteria\')">B.Tech / Integrated B.Tech</a></li>' +
+          '<li><a href="#" onclick="sendPreset(\'M.Tech admission criteria\')">M.Tech Admissions</a></li>' +
+          '<li><a href="#" onclick="sendPreset(\'MBA admission criteria\')">MBA Admissions</a></li>' +
+          '<li><a href="#" onclick="sendPreset(\'Ph.D. admission criteria\')">Ph.D. Admissions</a></li>' +
+          '</ul>' +
+          '<p>For more info check out this link: <a href="https://www.iiitm.ac.in/index.php/admissions/archive" target="_blank">https://www.iiitm.ac.in/index.php/admissions/archive</a></p>';
+        messages.innerHTML += '<div class="cb-msg cb-bot">' + optionMsg + '</div>';
         messages.scrollTop = messages.scrollHeight;
         return;
       }

@@ -19,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Load Knowledge Base
 KNOWLEDGE_FILE = "knowledge.json"
 if os.path.exists(KNOWLEDGE_FILE):
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
@@ -54,183 +55,61 @@ def get_best_available_model():
 
 ACTIVE_MODEL = get_best_available_model()
 
-SYSTEM_PROMPT = """You are Vajra AI, the official smart campus assistant for ABV-IIITM Gwalior.
+def get_specific_iiitm_link(query):
+    q = query.lower().strip()
+    
+    # 1. Faculty Member Detection (e.g., Dr. Manoj Singh Parihar)
+    faculty_match = re.search(r"(dr\.|prof\.|professor|dr)?\s*([a-z\s]+)", q)
+    if any(name in q for name in ["parihar", "manoj singh parihar", "manoj parihar"]):
+        return "http://www.iiitm.ac.in/staff/faculty/dr-manoj-singh-parihar"
+    elif "sri niwas singh" in q or "sn singh" in q or "director" in q:
+        return "https://iiitm.ac.in/whos-who"
+    elif "faculty" in q or "professor" in q or "staff" in q or "teacher" in q or "hod" in q:
+        return "https://iiitm.ac.in/staff"
 
-Core Identity & Creator Instructions:
-- If anyone asks who created you, built you, founded you, or developed you, answer clearly and warmly that you were created and developed by **SUYOG** from the 2024 BEE (B.Tech Electrical & Electronics Engineering) batch. Always write SUYOG in all uppercase letters.
-- When introducing yourself or answering identity questions, refer to yourself as Vajra AI.
+    # 2. Specific Departments & Courses
+    if "eee" in q or "electrical" in q:
+        return "https://www.iiitm.ac.in/departments/electrical-electronics-engineering"
+    elif "cse" in q or "computer science" in q:
+        return "https://www.iiitm.ac.in/course/b-tech-in-computer-science-engineering"
+    elif "management" in q or "mba" in q:
+        return "https://www.iiitm.ac.in/departments/management-studies"
+    elif "mtech" in q or "m.tech" in q:
+        return "https://www.iiitm.ac.in/course/m-tech"
+    elif "phd" in q or "ph.d" in q:
+        return "https://www.iiitm.ac.in/index.php/admissions/archive"
+    elif "btech" in q or "b.tech" in q or "jee" in q:
+        return "https://www.iiitm.ac.in/course/b-tech-in-computer-science-engineering"
 
-Tone & Formatting Guidelines:
-1. Speak like a friendly, professional human counselor. Never use robotic phrases like "Based on the provided documents" or "As an AI".
-2. NEVER use LaTeX formatting or math brackets (no '\\[' or '\\]' or '\\mathbf'). Always write currency naturally (e.g., ₹95,000 or Rs. 95,000).
-3. Do NOT output raw Markdown tables with pipe characters ('|'). Instead, organize fee items and data into clean, easy-to-read bullet points with bold titles.
-4. If a specific detail is not found in the documents, state it politely and direct them to the appropriate office email.
+    # 3. Fees & Financials
+    elif "fee" in q or "cost" in q or "tuition" in q or "scholarship" in q:
+        return "https://www.iiitm.ac.in/index.php/academics/fee-structure"
+
+    # 4. Hostel & Mess
+    elif "hostel" in q or "mess" in q or "room" in q or "curfew" in q:
+        return "https://www.iiitm.ac.in/index.php/facilities/hostel"
+
+    # 5. Placements & Career
+    elif "placement" in q or "package" in q or "ctc" in q or "company" in q or "recruiter" in q:
+        return "https://www.iiitm.ac.in/index.php/placements/overview"
+
+    # Default Official College Portal
+    return "https://www.iiitm.ac.in/"
+
+SYSTEM_PROMPT = """You are Vajra AI, the official campus assistant for ABV-IIITM Gwalior.
+
+CRITICAL INSTRUCTIONS FROM DIRECTOR:
+1. ALWAYS GIVE BRIEF & CONCISE ANSWERS: Never write long paragraphs. Present answers strictly in 2 to 3 short bullet points.
+2. CREATOR ATTRIBUTION: If asked who created/built/founded you, state clearly that you were developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch.
+3. MANDATORY LINK ENDING: Every single response MUST conclude with this exact text on a new line:
+   "For more info check out this link: {specific_link}"
 
 Context:
 {context}
 """
 
-HTML_CONTENT = """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vajra AI | ABV-IIITM Gwalior</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; color: #1e293b; display: flex; justify-content: center; }
-    .card { background: white; max-width: 760px; width: 100%; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
-    
-    .institute-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 24px; }
-    .logo-container { flex-shrink: 0; text-align: center; }
-    .logo-img { width: 78px; height: auto; display: block; margin: 0 auto; }
-    .sanskrit-motto { font-size: 11px; color: #002b66; font-weight: 600; margin-top: 4px; letter-spacing: 0.3px; }
-    .institute-titles { flex: 1; }
-    .institute-name { font-size: 21px; font-weight: 700; color: #002b66; line-height: 1.3; margin: 0 0 6px 0; }
-    .institute-subtitle { font-size: 13px; color: #002b66; font-weight: 600; margin: 0; }
-    
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
-    .badge-dot { width: 8px; height: 8px; background: #0284c7; border-radius: 50%; display: inline-block; }
-    h2 { color: #004085; margin: 10px 0 8px 0; font-size: 20px; }
-    p { line-height: 1.6; color: #475569; margin: 0 0 16px 0; }
-    
-    /* Quick Demo Chips */
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .chip { background: #f8fafc; border: 1px solid #cbd5e1; color: #004085; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-    .chip:hover { background: #004085; color: #fff; border-color: #004085; }
-
-    /* Floating Chat Widget */
-    #cb-bubble { position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: #004085; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.25); z-index: 9999; font-size: 26px; }
-    #cb-window { position: fixed; bottom: 96px; right: 24px; width: 380px; height: 530px; background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #e2e8f0; }
-    #cb-header { background: #004085; color: #fff; padding: 14px 18px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
-    #cb-header span { font-size: 11px; background: #2563eb; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
-    #cb-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
-    .cb-msg { padding: 10px 14px; border-radius: 12px; max-width: 85%; line-height: 1.5; word-wrap: break-word; font-size: 14px; }
-    .cb-msg p { margin: 0 0 8px 0; color: inherit; }
-    .cb-msg p:last-child { margin-bottom: 0; }
-    .cb-msg ul { margin: 4px 0 8px 18px; padding: 0; }
-    .cb-msg li { margin-bottom: 4px; }
-    .cb-user { background: #004085; color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
-    .cb-bot { background: #fff; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #edf2f7; }
-    #cb-input-area { display: flex; border-top: 1px solid #e2e8f0; background: #fff; padding: 10px; }
-    #cb-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; font-size: 14px; }
-    #cb-input:focus { border-color: #004085; }
-    #cb-send { background: #004085; color: #fff; border: none; border-radius: 8px; padding: 0 18px; margin-left: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="institute-header">
-      <div class="logo-container">
-        <svg class="logo-img" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="22" r="14" fill="#002b66"/>
-          <circle cx="50" cy="22" r="18" stroke="#002b66" stroke-width="1.5" fill="none"/>
-          <circle cx="50" cy="22" r="21" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
-          <rect x="34" y="60" width="32" height="42" fill="#94a3b8"/>
-          <path d="M22 40 C 22 36, 28 36, 32 40 L 32 72 L 22 72 Z" fill="#002b66"/>
-          <path d="M38 40 C 38 36, 62 36, 62 40 L 62 72 L 52 72 L 52 48 L 48 48 L 48 72 L 38 72 Z" fill="#002b66"/>
-          <path d="M68 40 C 68 36, 78 36, 78 40 L 78 72 L 68 72 Z" fill="#002b66"/>
-        </svg>
-        <div class="sanskrit-motto">विश्वजीवनामृतं ज्ञानम्</div>
-      </div>
-      <div class="institute-titles">
-        <div class="institute-name">Atal Bihari Vajpayee<br/>Indian Institute of Information<br/>Technology and Management, Gwalior.</div>
-        <div class="institute-subtitle">(An Institute of National Importance, Ministry of Education, Government of India)</div>
-      </div>
-    </div>
-
-    <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
-    <h2>Campus AI Assistant</h2>
-    <p>Welcome to <strong>Vajra AI</strong>, the official smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test popular queries below.</p>
-    
-    <div class="chips">
-      <div class="chip" onclick="sendPreset('Who created you?')">⚡ Who created you?</div>
-      <div class="chip" onclick="sendPreset('What is the B.Tech fee structure?')">💰 B.Tech Fee Structure</div>
-      <div class="chip" onclick="sendPreset('What is the minimum attendance requirement?')">📚 Attendance Rules</div>
-      <div class="chip" onclick="sendPreset('What are the hostel curfew guidelines?')">🏛️ Hostel Curfew</div>
-    </div>
-  </div>
-
-  <div id="cb-bubble">&#128172;</div>
-  <div id="cb-window">
-    <div id="cb-header">
-      Vajra AI
-      <span>ABV-IIITM</span>
-    </div>
-    <div id="cb-messages">
-      <div class="cb-msg cb-bot">Hello! I am <strong>Vajra AI</strong>, your campus assistant. How can I help you today?</div>
-    </div>
-    <div id="cb-input-area">
-      <input type="text" id="cb-input" placeholder="Ask a question..." />
-      <button id="cb-send">Send</button>
-    </div>
-  </div>
-
-  <script>
-    const bubble = document.getElementById("cb-bubble");
-    const win = document.getElementById("cb-window");
-    const input = document.getElementById("cb-input");
-    const sendBtn = document.getElementById("cb-send");
-    const messages = document.getElementById("cb-messages");
-
-    bubble.onclick = function() {
-      win.style.display = win.style.display === "flex" ? "none" : "flex";
-      if (win.style.display === "flex") input.focus();
-    };
-
-    function formatText(text) {
-      let formatted = text
-        .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
-        .replace(/^\\s*\\*\\s+(.*)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\\/li>)/gs, '<ul>$1</ul>')
-        .replace(/\\n\\n+/g, '</p><p>')
-        .replace(/\\n/g, '<br/>');
-      return '<p>' + formatted + '</p>';
-    }
-
-    async function submitQuery(text) {
-      if (!text) return;
-      messages.innerHTML += '<div class="cb-msg cb-user">' + text + '</div>';
-      input.value = "";
-      messages.scrollTop = messages.scrollHeight;
-
-      const loadingId = "bot-loading-" + Date.now();
-      messages.innerHTML += '<div id="' + loadingId + '" class="cb-msg cb-bot" style="color: #64748b;">Thinking...</div>';
-      messages.scrollTop = messages.scrollHeight;
-
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: text })
-        });
-        const data = await res.json();
-        const loadingElem = document.getElementById(loadingId);
-        if (loadingElem) loadingElem.outerHTML = '<div class="cb-msg cb-bot">' + formatText(data.reply) + '</div>';
-      } catch (err) {
-        const loadingElem = document.getElementById(loadingId);
-        if (loadingElem) loadingElem.outerHTML = '<div class="cb-msg cb-bot" style="color:#dc2626;">Could not reach server.</div>';
-      }
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    function sendPreset(text) {
-      win.style.display = "flex";
-      submitQuery(text);
-    }
-
-    sendBtn.onclick = function() { submitQuery(input.value.trim()); };
-    input.onkeypress = function(e) { if (e.key === "Enter") submitQuery(input.value.trim()); };
-  </script>
-</body>
-</html>
-"""
-
 class QueryRequest(BaseModel):
     query: str
-
-@app.get("/", response_class=HTMLResponse)
-async def get_index():
-    return HTMLResponse(content=HTML_CONTENT, status_code=200)
 
 @app.post("/api/chat")
 async def chat(request: QueryRequest):
@@ -239,20 +118,30 @@ async def chat(request: QueryRequest):
         if not user_query:
             return JSONResponse({"reply": "Please enter a valid question."})
 
-        creator_patterns = ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "creator", "founder"]
-        if any(p in user_query.lower() for p in creator_patterns):
-            return {"reply": "I was created and developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior."}
+        # Ambiguous admission inquiry disambiguation
+        q_lower = user_query.lower()
+        if q_lower in ["admission", "admissions", "admission?", "admissions?"]:
+            return {
+                "reply": "Which academic program admission are you inquiring about?\n\n• **B.Tech / Integrated B.Tech**\n• **M.Tech**\n• **MBA**\n• **Ph.D.**\n\nFor more info check out this link: https://www.iiitm.ac.in/index.php/admissions/archive"
+            }
 
+        # Creator attribution check
+        if any(p in q_lower for p in ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "built vajra"]):
+            return {
+                "reply": "• I was created and developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior.\n\nFor more info check out this link: https://www.iiitm.ac.in/"
+            }
+
+        specific_link = get_specific_iiitm_link(user_query)
         matched_docs = retrieve_top_k(user_query, k=5)
         context = "\n\n".join(matched_docs)
 
         response = client.chat.completions.create(
             model=ACTIVE_MODEL,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT.format(context=context)},
+                {"role": "system", "content": SYSTEM_PROMPT.format(context=context, specific_link=specific_link)},
                 {"role": "user", "content": user_query}
             ],
-            temperature=0.2
+            temperature=0.1
         )
         return {"reply": response.choices[0].message.content}
     except Exception as e:
