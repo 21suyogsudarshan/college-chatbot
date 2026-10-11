@@ -1,49 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vajra AI | ABV-IIITM Gwalior</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; color: #1e293b; display: flex; justify-content: center; }
-    .card { background: white; max-width: 760px; width: 100%; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 40px 20px;
+      color: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      max-width: 760px;
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+      padding: 36px;
+      border: 1px solid #e2e8f0;
+    }
     
     /* Official Institute Header */
-    .institute-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 24px; }
-    .logo-container { flex-shrink: 0; text-align: center; }
-    .logo-img { width: 78px; height: auto; display: block; margin: 0 auto; }
-    .sanskrit-motto { font-size: 11px; color: #002b66; font-weight: 600; margin-top: 4px; letter-spacing: 0.3px; }
-    .institute-titles { flex: 1; }
-    .institute-name { font-size: 21px; font-weight: 700; color: #002b66; line-height: 1.3; margin: 0 0 6px 0; }
-    .institute-subtitle { font-size: 13px; color: #002b66; font-weight: 600; margin: 0; }
+    .institute-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+    }
+    .logo-container {
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .logo-img {
+      width: 82px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    .sanskrit-motto {
+      font-size: 11px;
+      color: #002b66;
+      font-weight: 700;
+      margin-top: 6px;
+      letter-spacing: 0.2px;
+    }
+    .institute-titles {
+      flex: 1;
+    }
+    .institute-name {
+      font-size: 21px;
+      font-weight: 800;
+      color: #002b66;
+      line-height: 1.3;
+      margin: 0 0 6px 0;
+    }
+    .institute-subtitle {
+      font-size: 12.5px;
+      color: #1e3a8a;
+      font-weight: 600;
+      margin: 0;
+    }
     
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
-    .badge-dot { width: 8px; height: 8px; background: #0284c7; border-radius: 50%; display: inline-block; }
-    h2 { color: #004085; margin: 10px 0 8px 0; font-size: 20px; }
-    p { line-height: 1.6; color: #475569; margin: 0 0 16px 0; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: #0284c7;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    h2 {
+      color: #002b66;
+      margin: 8px 0 8px 0;
+      font-size: 22px;
+    }
+    p {
+      line-height: 1.6;
+      color: #475569;
+      margin: 0 0 16px 0;
+      font-size: 15px;
+    }
     
-    /* Interactive Preset Chips */
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .chip { background: #f8fafc; border: 1px solid #cbd5e1; color: #004085; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-    .chip:hover { background: #004085; color: #fff; border-color: #004085; }
+    /* Interactive Quick Query Chips */
+    .chips-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .chip {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #002b66;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      background: #002b66;
+      color: #ffffff;
+      border-color: #002b66;
+      box-shadow: 0 4px 12px rgba(0, 43, 102, 0.15);
+    }
 
-    /* Floating Chat Window */
-    #cb-bubble { position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: #004085; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.25); z-index: 9999; font-size: 26px; }
-    #cb-window { position: fixed; bottom: 96px; right: 24px; width: 380px; height: 530px; background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #e2e8f0; }
-    #cb-header { background: #004085; color: #fff; padding: 14px 18px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
-    #cb-header span { font-size: 11px; background: #2563eb; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
-    #cb-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
-    .cb-msg { padding: 10px 14px; border-radius: 12px; max-width: 85%; line-height: 1.5; word-wrap: break-word; font-size: 14px; }
-    .cb-msg p { margin: 0 0 8px 0; color: inherit; }
-    .cb-msg p:last-child { margin-bottom: 0; }
-    .cb-msg ul { margin: 4px 0 8px 18px; padding: 0; }
-    .cb-msg li { margin-bottom: 4px; }
-    .cb-user { background: #004085; color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
-    .cb-bot { background: #fff; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #edf2f7; }
-    #cb-input-area { display: flex; border-top: 1px solid #e2e8f0; background: #fff; padding: 10px; }
-    #cb-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; font-size: 14px; }
-    #cb-input:focus { border-color: #004085; }
-    #cb-send { background: #004085; color: #fff; border: none; border-radius: 8px; padding: 0 18px; margin-left: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+    /* Floating Chat Window & Widget */
+    #cb-bubble {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 62px;
+      height: 62px;
+      background: #002b66;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 43, 102, 0.3);
+      z-index: 9999;
+      font-size: 26px;
+      transition: transform 0.2s ease;
+    }
+    #cb-bubble:hover {
+      transform: scale(1.05);
+    }
+    #cb-window {
+      position: fixed;
+      bottom: 96px;
+      right: 24px;
+      width: 390px;
+      height: 540px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 9999;
+      border: 1px solid #e2e8f0;
+    }
+    #cb-header {
+      background: #002b66;
+      color: #fff;
+      padding: 16px 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 16px;
+    }
+    #cb-header span {
+      font-size: 11px;
+      background: #2563eb;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #cb-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f8fafc;
+    }
+    .cb-msg {
+      padding: 11px 15px;
+      border-radius: 14px;
+      max-width: 86%;
+      line-height: 1.5;
+      word-wrap: break-word;
+      font-size: 14px;
+    }
+    .cb-msg p {
+      margin: 0 0 8px 0;
+      color: inherit;
+      font-size: 14px;
+    }
+    .cb-msg p:last-child {
+      margin-bottom: 0;
+    }
+    .cb-msg ul {
+      margin: 4px 0 8px 18px;
+      padding: 0;
+    }
+    .cb-msg li {
+      margin-bottom: 4px;
+    }
+    .cb-user {
+      background: #002b66;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .cb-bot {
+      background: #ffffff;
+      color: #1e293b;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+    #cb-input-area {
+      display: flex;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 12px;
+    }
+    #cb-input {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+    #cb-input:focus {
+      border-color: #002b66;
+    }
+    #cb-send {
+      background: #002b66;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s ease;
+    }
+    #cb-send:hover {
+      background: #1e3a8a;
+    }
   </style>
 </head>
 <body>
@@ -69,8 +292,9 @@
 
     <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
     <h2>Campus AI Assistant</h2>
-    <p>Welcome to <strong>Vajra AI</strong>, the official smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test popular queries below.</p>
+    <p>Welcome to <strong>Vajra AI</strong>, the official campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test one of the quick queries below.</p>
     
+    <div class="chips-label">Popular Queries</div>
     <div class="chips">
       <div class="chip" onclick="sendPreset('Who created you?')">Who created you?</div>
       <div class="chip" onclick="sendPreset('What is the B.Tech fee structure?')">B.Tech Fee Structure</div>
@@ -124,7 +348,7 @@
       input.value = "";
       messages.scrollTop = messages.scrollHeight;
 
-      // Direct local handle for creator inquiry
+      // Creator rule hardcoded directly on frontend
       const lower = text.toLowerCase();
       if (lower.includes("who made") || lower.includes("who created") || lower.includes("who developed") || lower.includes("founder") || lower.includes("creator")) {
         messages.innerHTML += '<div class="cb-msg cb-bot"><p>I was created and developed by <strong>SUYOG</strong> from the <strong>2024 BEE (B.Tech Electrical & Electronics Engineering)</strong> batch at ABV-IIITM Gwalior.</p></div>';
