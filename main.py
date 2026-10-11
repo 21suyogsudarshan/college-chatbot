@@ -19,7 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load Knowledge Base & Search Engine
 KNOWLEDGE_FILE = "knowledge.json"
 if os.path.exists(KNOWLEDGE_FILE):
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
@@ -81,7 +80,6 @@ HTML_CONTENT = """<!DOCTYPE html>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; color: #1e293b; display: flex; justify-content: center; }
     .card { background: white; max-width: 760px; width: 100%; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; box-sizing: border-box; }
     
-    /* Official Institute Header Branding */
     .institute-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 24px; margin-bottom: 24px; }
     .logo-container { flex-shrink: 0; text-align: center; }
     .logo-img { width: 78px; height: auto; display: block; margin: 0 auto; }
@@ -93,8 +91,13 @@ HTML_CONTENT = """<!DOCTYPE html>
     .badge { display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
     .badge-dot { width: 8px; height: 8px; background: #0284c7; border-radius: 50%; display: inline-block; }
     h2 { color: #004085; margin: 10px 0 8px 0; font-size: 20px; }
-    p { line-height: 1.6; color: #475569; margin: 0 0 12px 0; }
+    p { line-height: 1.6; color: #475569; margin: 0 0 16px 0; }
     
+    /* Quick Demo Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .chip { background: #f8fafc; border: 1px solid #cbd5e1; color: #004085; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .chip:hover { background: #004085; color: #fff; border-color: #004085; }
+
     /* Floating Chat Widget */
     #cb-bubble { position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: #004085; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.25); z-index: 9999; font-size: 26px; }
     #cb-window { position: fixed; bottom: 96px; right: 24px; width: 380px; height: 530px; background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #e2e8f0; }
@@ -119,13 +122,10 @@ HTML_CONTENT = """<!DOCTYPE html>
     <div class="institute-header">
       <div class="logo-container">
         <svg class="logo-img" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Top Circles -->
           <circle cx="50" cy="22" r="14" fill="#002b66"/>
           <circle cx="50" cy="22" r="18" stroke="#002b66" stroke-width="1.5" fill="none"/>
           <circle cx="50" cy="22" r="21" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
-          <!-- Pillar Base -->
           <rect x="34" y="60" width="32" height="42" fill="#94a3b8"/>
-          <!-- IIIT Arch -->
           <path d="M22 40 C 22 36, 28 36, 32 40 L 32 72 L 22 72 Z" fill="#002b66"/>
           <path d="M38 40 C 38 36, 62 36, 62 40 L 62 72 L 52 72 L 52 48 L 48 48 L 48 72 L 38 72 Z" fill="#002b66"/>
           <path d="M68 40 C 68 36, 78 36, 78 40 L 78 72 L 68 72 Z" fill="#002b66"/>
@@ -140,7 +140,14 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
     <h2>Campus AI Assistant</h2>
-    <p>Welcome to <strong>Vajra AI</strong>, the official smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right to query about courses, admissions, fee schedules, ordinances, or hostel guidelines.</p>
+    <p>Welcome to <strong>Vajra AI</strong>, the official smart campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test popular queries below.</p>
+    
+    <div class="chips">
+      <div class="chip" onclick="sendPreset('Who created you?')">⚡ Who created you?</div>
+      <div class="chip" onclick="sendPreset('What is the B.Tech fee structure?')">💰 B.Tech Fee Structure</div>
+      <div class="chip" onclick="sendPreset('What is the minimum attendance requirement?')">📚 Attendance Rules</div>
+      <div class="chip" onclick="sendPreset('What are the hostel curfew guidelines?')">🏛️ Hostel Curfew</div>
+    </div>
   </div>
 
   <div id="cb-bubble">&#128172;</div>
@@ -150,7 +157,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <span>ABV-IIITM</span>
     </div>
     <div id="cb-messages">
-      <div class="cb-msg cb-bot">Hello! I am <strong>Vajra AI</strong>, your campus assistant. How can I help you with admissions, syllabi, fees, or hostel queries?</div>
+      <div class="cb-msg cb-bot">Hello! I am <strong>Vajra AI</strong>, your campus assistant. How can I help you today?</div>
     </div>
     <div id="cb-input-area">
       <input type="text" id="cb-input" placeholder="Ask a question..." />
@@ -180,10 +187,8 @@ HTML_CONTENT = """<!DOCTYPE html>
       return '<p>' + formatted + '</p>';
     }
 
-    async function handleSend() {
-      const text = input.value.trim();
+    async function submitQuery(text) {
       if (!text) return;
-
       messages.innerHTML += '<div class="cb-msg cb-user">' + text + '</div>';
       input.value = "";
       messages.scrollTop = messages.scrollHeight;
@@ -208,8 +213,13 @@ HTML_CONTENT = """<!DOCTYPE html>
       messages.scrollTop = messages.scrollHeight;
     }
 
-    sendBtn.onclick = handleSend;
-    input.onkeypress = function(e) { if (e.key === "Enter") handleSend(); };
+    function sendPreset(text) {
+      win.style.display = "flex";
+      submitQuery(text);
+    }
+
+    sendBtn.onclick = function() { submitQuery(input.value.trim()); };
+    input.onkeypress = function(e) { if (e.key === "Enter") submitQuery(input.value.trim()); };
   </script>
 </body>
 </html>
