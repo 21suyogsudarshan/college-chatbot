@@ -19,7 +19,7 @@
     }
     .card {
       background: white;
-      max-width: 760px;
+      max-width: 780px;
       width: 100%;
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
@@ -97,18 +97,18 @@
     p {
       line-height: 1.6;
       color: #475569;
-      margin: 0 0 16px 0;
+      margin: 0 0 18px 0;
       font-size: 15px;
     }
     
     /* Interactive Quick Query Chips */
     .chips-label {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       color: #64748b;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
     .chips {
       display: flex;
@@ -119,18 +119,22 @@
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       color: #002b66;
-      padding: 8px 16px;
+      padding: 9px 16px;
       border-radius: 20px;
       font-size: 13.5px;
       cursor: pointer;
       font-weight: 600;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .chip:hover {
       background: #002b66;
       color: #ffffff;
       border-color: #002b66;
       box-shadow: 0 4px 12px rgba(0, 43, 102, 0.15);
+      transform: translateY(-1px);
     }
 
     /* Floating Chat Window & Widget */
@@ -292,14 +296,16 @@
 
     <div class="badge"><span class="badge-dot"></span> Vajra AI Active</div>
     <h2>Campus AI Assistant</h2>
-    <p>Welcome to <strong>Vajra AI</strong>, the official campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test one of the quick queries below.</p>
+    <p>Welcome to <strong>Vajra AI</strong>, the official campus assistant for ABV-IIITM Gwalior. Click the blue chat bubble at the bottom right or test one of the high-frequency queries below.</p>
     
-    <div class="chips-label">Popular Queries</div>
+    <div class="chips-label">Most Frequently Asked Queries</div>
     <div class="chips">
-      <div class="chip" onclick="sendPreset('Who created you?')">Who created you?</div>
-      <div class="chip" onclick="sendPreset('What is the B.Tech fee structure?')">B.Tech Fee Structure</div>
-      <div class="chip" onclick="sendPreset('What is the minimum attendance requirement?')">Attendance Rules</div>
-      <div class="chip" onclick="sendPreset('What are the hostel curfew guidelines?')">Hostel Curfew</div>
+      <div class="chip" onclick="sendPreset('Who created you?')">⚡ Who developed Vajra AI?</div>
+      <div class="chip" onclick="sendPreset('What is the total fee payable for B.Tech in 2026?')">💰 B.Tech 1st Sem Fee Breakdown</div>
+      <div class="chip" onclick="sendPreset('What are the rules and CGPA criteria for UG branch change?')">🎓 Branch Change Rules</div>
+      <div class="chip" onclick="sendPreset('What is the minimum mandatory attendance requirement?')">📊 Attendance Cutoff Rule</div>
+      <div class="chip" onclick="sendPreset('Where is the Non-GATE written test conducted?')">🏢 Non-GATE Exam Venue</div>
+      <div class="chip" onclick="sendPreset('What are the placement statistics and highest CTC?')">💼 Placement Highlights</div>
     </div>
   </div>
 
@@ -348,7 +354,7 @@
       input.value = "";
       messages.scrollTop = messages.scrollHeight;
 
-      // Creator rule hardcoded directly on frontend
+      // Direct creator attribution rule
       const lower = text.toLowerCase();
       if (lower.includes("who made") || lower.includes("who created") || lower.includes("who developed") || lower.includes("founder") || lower.includes("creator")) {
         messages.innerHTML += '<div class="cb-msg cb-bot"><p>I was created and developed by <strong>SUYOG</strong> from the <strong>2024 BEE (B.Tech Electrical & Electronics Engineering)</strong> batch at ABV-IIITM Gwalior.</p></div>';
