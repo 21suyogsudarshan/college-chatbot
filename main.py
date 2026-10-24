@@ -2,12 +2,12 @@ import os
 import json
 import re
 import traceback
-import urllib.request
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from rank_bm25 import BM25Okapi
+from openai import OpenAI
 
 app = FastAPI(title="Vajra AI - Campus Assistant")
 
@@ -39,6 +39,15 @@ def retrieve_top_k(query, k=5):
     top_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
     matched = [documents[i] for i in top_indices if scores[i] > 0]
     return matched if matched else [documents[i] for i in top_indices[:k]]
+
+# Groq OpenAI-Compatible Client
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+client = OpenAI(
+    base_url="https://api.groq.com/openai/v1",
+    api_key=GROQ_API_KEY
+)
+
+ACTIVE_MODEL = "llama-3.3-70b-versatile"
 
 def get_specific_iiitm_link(query):
     q = query.lower().strip()
@@ -110,35 +119,6 @@ Context:
 {context}
 """
 
-def generate_gemini_reply(system_text, user_text, api_key):
-    # Tries gemini-2.0-flash first, then falls back to gemini-1.5-flash
-    for model_name in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-        payload = {
-            "contents": [
-                {
-                    "role": "user",
-                    "parts": [{"text": f"{system_text}\n\nUser Question: {user_text}"}]
-                }
-            ],
-            "generationConfig": {
-                "temperature": 0.1
-            }
-        }
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode('utf-8'),
-                headers={'Content-Type': 'application/json'}
-            )
-            with urllib.request.urlopen(req) as response:
-                res_data = json.loads(response.read().decode('utf-8'))
-                return res_data["candidates"][0]["content"]["parts"][0]["text"]
-        except Exception as e:
-            print(f"Model {model_name} attempt error: {e}")
-            continue
-    raise Exception("Gemini API call failed. Please check GEMINI_API_KEY in Render.")
-
 class QueryRequest(BaseModel):
     query: str
 
@@ -166,14 +146,19 @@ async def chat(request: QueryRequest):
         specific_link = get_specific_iiitm_link(user_query)
         matched_docs = retrieve_top_k(user_query, k=5)
         context = "\n\n".join(matched_docs)
-        formatted_prompt = SYSTEM_PROMPT.format(context=context, specific_link=specific_link)
 
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-        if not api_key:
-            return JSONResponse({"reply": "GEMINI_API_KEY missing in Render environment variables."}, status_code=200)
+        if not GROQ_API_KEY:
+            return JSONResponse({"reply": "GROQ_API_KEY missing in Render environment variables."}, status_code=200)
 
-        reply = generate_gemini_reply(formatted_prompt, user_query, api_key)
-        return {"reply": reply}
+        response = client.chat.completions.create(
+            model=ACTIVE_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT.format(context=context, specific_link=specific_link)},
+                {"role": "user", "content": user_query}
+            ],
+            temperature=0.1
+        )
+        return {"reply": response.choices[0].message.content}
     except Exception as e:
         traceback.print_exc()
         return JSONResponse({"reply": f"Internal error: {str(e)}"}, status_code=200)
