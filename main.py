@@ -40,14 +40,22 @@ def retrieve_top_k(query, k=5):
     matched = [documents[i] for i in top_indices if scores[i] > 0]
     return matched if matched else [documents[i] for i in top_indices[:k]]
 
-# Groq OpenAI-Compatible Client
+# Groq Client
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
     api_key=GROQ_API_KEY
 )
 
-ACTIVE_MODEL = "llama-3.3-70b-versatile"
+def get_active_groq_model():
+    try:
+        models = [m.id for m in client.models.list().data if "whisper" not in m.id and "guard" not in m.id]
+        for priority in ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192", "llama3-8b-8192"]:
+            if priority in models:
+                return priority
+        return models[0] if models else "llama-3.1-8b-instant"
+    except Exception:
+        return "llama-3.1-8b-instant"
 
 def get_specific_iiitm_link(query):
     q = query.lower().strip()
@@ -150,8 +158,10 @@ async def chat(request: QueryRequest):
         if not GROQ_API_KEY:
             return JSONResponse({"reply": "GROQ_API_KEY missing in Render environment variables."}, status_code=200)
 
+        active_model = get_active_groq_model()
+
         response = client.chat.completions.create(
-            model=ACTIVE_MODEL,
+            model=active_model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT.format(context=context, specific_link=specific_link)},
                 {"role": "user", "content": user_query}
