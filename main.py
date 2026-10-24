@@ -4,7 +4,7 @@ import re
 import traceback
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from rank_bm25 import BM25Okapi
 from openai import OpenAI
@@ -40,22 +40,19 @@ def retrieve_top_k(query, k=5):
     matched = [documents[i] for i in top_indices if scores[i] > 0]
     return matched if matched else [documents[i] for i in top_indices[:k]]
 
-# OpenRouter Configuration (Uses environment variable set in Render)
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
+# Google Gemini Client via OpenAI Compatibility Layer
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=OPENROUTER_API_KEY
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    api_key=GEMINI_API_KEY
 )
 
-# Free Llama 3.1 Model on OpenRouter
-ACTIVE_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+ACTIVE_MODEL = "gemini-1.5-flash"
 
 def get_specific_iiitm_link(query):
     q = query.lower().strip()
     
-    # -------------------------------------------------------------
-    # 1. FACULTY DETECTOR & DYNAMIC URL SLUG GENERATOR
-    # -------------------------------------------------------------
+    # 1. Faculty Mappings & Slug Generator
     if "pinku" in q or "ranjan" in q:
         return "https://iiitm.ac.in/staff/faculty/dr-pinku-ranjan"
     elif "parihar" in q or "manoj" in q:
@@ -63,7 +60,6 @@ def get_specific_iiitm_link(query):
     elif "sri niwas" in q or "sn singh" in q or "director" in q:
         return "https://iiitm.ac.in/whos-who"
 
-    # Automatic Regex Slugifier for any Professor Name (e.g., "Dr. First Last" -> /dr-first-last)
     prof_match = re.search(r"(?:dr\.|prof\.|professor)?\s*([a-z]+)\s+([a-z]+(?:\s+[a-z]+)?)", q)
     stop_words = ["what", "where", "when", "which", "about", "tell", "does", "have", "total", "cost", "fee", "rule"]
     if prof_match:
@@ -75,9 +71,7 @@ def get_specific_iiitm_link(query):
     if "faculty" in q or "professor" in q or "staff" in q or "teacher" in q or "hod" in q:
         return "https://iiitm.ac.in/staff"
 
-    # -------------------------------------------------------------
-    # 2. DEPARTMENTS & ACADEMIC PROGRAMS
-    # -------------------------------------------------------------
+    # 2. Departments & Academic Programs
     if "eee" in q or "electrical" in q or "electronics" in q:
         return "https://www.iiitm.ac.in/departments/electrical-electronics-engineering"
     elif "cse" in q or "computer science" in q or "it" in q or "information technology" in q:
@@ -91,15 +85,11 @@ def get_specific_iiitm_link(query):
     elif "btech" in q or "b.tech" in q or "jee" in q or "josaa" in q or "csab" in q:
         return "https://www.iiitm.ac.in/course/b-tech-in-computer-science-engineering"
 
-    # -------------------------------------------------------------
-    # 3. FEES, FINANCIAL AID & SCHOLARSHIPS
-    # -------------------------------------------------------------
+    # 3. Fees & Financial Aid
     elif any(k in q for k in ["fee", "cost", "tuition", "scholarship", "financial aid", "waiver"]):
         return "https://www.iiitm.ac.in/index.php/academics/fee-structure"
 
-    # -------------------------------------------------------------
-    # 4. HOSTEL, MESS & CAMPUS AMENITIES
-    # -------------------------------------------------------------
+    # 4. Facilities & Campus
     elif any(k in q for k in ["hostel", "mess", "room", "curfew", "accommodation", "canteen"]):
         return "https://www.iiitm.ac.in/index.php/facilities/hostel"
     elif "library" in q or "book" in q or "journal" in q:
@@ -107,19 +97,14 @@ def get_specific_iiitm_link(query):
     elif "sports" in q or "gym" in q or "ground" in q or "club" in q:
         return "https://www.iiitm.ac.in/index.php/facilities/sports"
 
-    # -------------------------------------------------------------
-    # 5. PLACEMENTS & CAREERS
-    # -------------------------------------------------------------
+    # 5. Placements
     elif any(k in q for k in ["placement", "package", "ctc", "company", "recruiter", "salary", "internship"]):
         return "https://www.iiitm.ac.in/index.php/placements/overview"
 
-    # -------------------------------------------------------------
-    # 6. ADMISSIONS GENERAL
-    # -------------------------------------------------------------
+    # 6. Admissions General
     elif "admission" in q or "apply" in q or "cutoff" in q or "rank" in q:
         return "https://www.iiitm.ac.in/index.php/admissions/archive"
 
-    # Default Official IIITM Portal
     return "https://www.iiitm.ac.in/"
 
 SYSTEM_PROMPT = """You are Vajra AI, the official campus assistant for ABV-IIITM Gwalior.
@@ -146,13 +131,11 @@ async def chat(request: QueryRequest):
 
         q_lower = user_query.lower()
 
-        # Admission Disambiguation Prompt
         if q_lower in ["admission", "admissions", "admission?", "admissions?"]:
             return {
                 "reply": "Which academic program admission are you inquiring about?\n\n• **B.Tech / Integrated B.Tech**\n• **M.Tech**\n• **MBA**\n• **Ph.D.**\n\nFor more info check out this link: https://www.iiitm.ac.in/index.php/admissions/archive"
             }
 
-        # Creator Attribution Prompt
         if any(p in q_lower for p in ["who made you", "who created you", "who developed you", "who is your founder", "who built you", "built vajra"]):
             return {
                 "reply": "• I was created and developed by **SUYOG** from the **2024 BEE (B.Tech Electrical & Electronics Engineering)** batch at ABV-IIITM Gwalior.\n\nFor more info check out this link: https://www.iiitm.ac.in/"
