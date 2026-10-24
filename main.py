@@ -40,20 +40,15 @@ def retrieve_top_k(query, k=5):
     matched = [documents[i] for i in top_indices if scores[i] > 0]
     return matched if matched else [documents[i] for i in top_indices[:k]]
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
-client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=GROQ_API_KEY)
+# OpenRouter Configuration (Uses environment variable set in Render)
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY
+)
 
-def get_best_available_model():
-    try:
-        models = [m.id for m in client.models.list().data if "whisper" not in m.id and "guard" not in m.id and "tts" not in m.id]
-        for priority in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.6-27b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
-            if priority in models:
-                return priority
-        return models[0] if models else "openai/gpt-oss-20b"
-    except Exception:
-        return "openai/gpt-oss-20b"
-
-ACTIVE_MODEL = get_best_available_model()
+# Free Llama 3.1 Model on OpenRouter
+ACTIVE_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
 
 def get_specific_iiitm_link(query):
     q = query.lower().strip()
@@ -61,7 +56,6 @@ def get_specific_iiitm_link(query):
     # -------------------------------------------------------------
     # 1. FACULTY DETECTOR & DYNAMIC URL SLUG GENERATOR
     # -------------------------------------------------------------
-    # Explicit Overrides for Specific Names
     if "pinku" in q or "ranjan" in q:
         return "https://iiitm.ac.in/staff/faculty/dr-pinku-ranjan"
     elif "parihar" in q or "manoj" in q:
